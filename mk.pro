@@ -1,3 +1,35 @@
+% Representa una posicion donde un caballo esta comiendo
+% Se supone que X y Y seran numeros
+nom(X,Y).
+
+% Representa un caballo en la posicion X,Y.
+% Se asume que X,Y son numeros
+k(X,Y).
+
+% Predicado que Unifica en Noms las posibles opciones de comer
+% de un caballo que se encuentre e la casilla X,Y
+caballo_come_en(X, Y, Noms) :-
+	NX1 is X - 1, NY1 is Y - 2,
+    NX2 is X - 1, NY2 is Y + 2, 
+    NX3 is X + 1, NY3 is Y - 2,
+    NX4 is X + 1, NY4 is Y + 2,
+    NX5 is X - 2, NY5 is Y - 1,
+    NX6 is X - 2, NY6 is Y + 1,
+    NX7 is X + 2, NY7 is Y - 1,
+    NX8 is X + 2, NY8 is Y + 1,
+    Nom1 = nom(NX1,NY2),
+    Nom2 = nom(NX2,NY2),
+    Nom3 = nom(NX3,NY3),
+    Nom4 = nom(NX4,NY4),
+    Nom5 = nom(NX5,NY5),
+    Nom6 = nom(NX6,NY6),
+    Nom7 = nom(NX7,NY7),
+    Nom8 = nom(NX8,NY8),
+    Noms = [ Nom1, Nom2, Nom3, Nom4,
+    		Nom5, Nom6, Nom7, Nom8].
+
+
+
 
 % Recorrer una lista con backtracking.
 recorrer([X|Xs],X).
