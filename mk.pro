@@ -17,7 +17,7 @@ caballo_come_en(X, Y, Noms) :-
     NX6 is X - 2, NY6 is Y + 1,
     NX7 is X + 2, NY7 is Y - 1,
     NX8 is X + 2, NY8 is Y + 1,
-    Nom1 = nom(NX1,NY2),
+    Nom1 = nom(NX1,NY1),
     Nom2 = nom(NX2,NY2),
     Nom3 = nom(NX3,NY3),
     Nom4 = nom(NX4,NY4),
@@ -26,10 +26,32 @@ caballo_come_en(X, Y, Noms) :-
     Nom7 = nom(NX7,NY7),
     Nom8 = nom(NX8,NY8),
     Noms = [ Nom1, Nom2, Nom3, Nom4,
-    		Nom5, Nom6, Nom7, Nom8].
+             Nom5, Nom6, Nom7, Nom8
+	    ].
 
+% Predicado que dada una posicion X,Y en un tablero de NxN devuelve
+% en Xf y Yf la siguiente. Se recorre el tablero fila por fila.
+nextpos(N,X0,N,Xf,Yf)  :- Xf is X0 + 1, Xf =< N, Yf = 1.
+nextpos(N,X0,Y0,Xf,Yf) :- Y0 =< N, Xf = X0, Yf is Y0 + 1, Yf =< N.
 
+% Predicado que determina si un caballo k sobrevive el esado de posiciones
+% donde potencialmente puede ser comido.
+sobrevive(k(X,Y),[nom(ChompX,ChompY)|Death]) :- ChompX \= X,ChompY \= Y,
+						sobrevive(k(X,Y),Death).
 
+% Predicado que triunfa si NewOne sobrevive las comidas EatHere de los Knights
+% y NewParty es la lista de de Knights con NewONe metido y EatsNow las nuevas
+% posiciones donde los caballos comen.
+meteruno(Knights,EatHere,NewOne,EatsHere,NewParty,EatsNow) :- NewOne = k(X,Y),
+							sobrevive(NewOne,EatHere),
+							append([NewOne],Knights,NewParty),
+							append(EatsHere,EatHere,EatsNow).
+							
+%While? maybe
+dale()
+%While?
+arre(N,Max,Lista):- nextpos(1,1,X,Y),
+		    dale([k()],)
 
 % Recorrer una lista con backtracking.
 recorrer([X|Xs],X).
