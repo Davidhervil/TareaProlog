@@ -1,6 +1,10 @@
+:- dynamic(soluc/2).
 
 % Caballito Indomable :D
 k(X,Y).
+
+not(P) :- call(P), !, fail. 
+not(P).
 
 nextElem([],[]).
 nextElem([X|Xs],[X|Xs]).
@@ -20,7 +24,6 @@ eliminarMultiple([A|As], B, R) :- eliminar(A,B,R1), eliminarMultiple(As,R1,R).
 genList(N,X) :- genList1(N,[],X).
 genList1(0,L,L) :- !. 
 genList1(N,R,L) :- N > 0, N1 is N-1, genList1(N1,[N|R],L).
-
 
 
 % Empareja un elemento A con todos los elementos de una lista B
@@ -68,6 +71,19 @@ lalal(N, Tablero, TableroR) :- 	nextElem(Tablero, [Actual|TableroN]),
 lalal1(Actual, Actual, Tablero, [Actual|Tablero]):-!.
 lalal1(Actual, Otro, Tablero, [Actual,Otro|Tablero]).
 
+arre1(N,L) :- construirTablero(N,T),!, lalal(N,T,L).
 
-arre(N,K,L) :- construirTablero(N,T),!, lalal(N,T,L).
+start(N):- asserta(soluc(N,0)), end(N). 
 
+end(N):-	arre1(N,X1), 
+		  	length(X1,L),
+		 	soluc(N,A), 
+		 	L > A,
+		 	retract(soluc(N,A)), 
+		 	asserta(soluc(N,L)), 
+		 	fail.
+
+arre(N,L,X) :-   not(start(N)), 
+				 soluc(N,L),
+				 arre1(N,X),
+				 length(X,L). 
