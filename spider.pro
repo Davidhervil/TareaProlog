@@ -78,9 +78,27 @@ expande(Arbol,[Edge|Arbol],Aristas) :- member(Edge,Aristas), valido(Edge,Arbol).
 valido(edge(_,A,B),Arbol) :- pertenece(A,Arbol), \+(pertenece(B,Arbol)). %puede que pueda haber un cut aqui
 valido(edge(_,A,B),Arbol) :- \+(pertenece(A,Arbol)), pertenece(B,Arbol).
 
-pertenece(Nodo,[edge(_,Nodo,_)|_]):-!.
-pertenece(Nodo,[edge(_,_,Nodo)|_]):-!.
+pertenece(Nodo,[edge(_,Nodo,_)|_]):-!.%OJO CON EL GRAFO, si el arbol existe entonces el grafo ya esta
+pertenece(Nodo,[edge(_,_,Nodo)|_]):-!.%OJO CON EL GRAFO, si el arbol existe entonces el grafo ya esta
 pertenece(Nodo,[_|Resto]):-pertenece(Nodo,Resto).
 
-spider(Grafo,Arbol) :- arbol_cobertura(Grafo,Span), aranha(Span).
+spider(Grafo,Arbol) :- arbol_cobertura(Grafo,Arbol), aranha(Grafo,Arbol).
 
+aranha(Grafo,Span) :- listNodes(Grafo,Nodos), grados(Nodos,Span,Grados),
+					  check_grados(Grados,ok).
+
+check_grados([],ok).
+check_grados([],ya).
+check_grados([Grado|Grados],ok) :- Grado < 3, ! , check_grados(Grados,ok).
+check_grados([Grado|Grados],ya) :- Grado < 3, ! , check_grados(Grados,ya).
+check_grados([Grado|Grados],ok) :- Grado = 3, check_grados(Grados,ya).
+
+grados([],_,[]).
+grados([Nodo|Nodos],Arbol,[G|Grados]) :- grado(Nodo,Arbol,G),
+										 grados(Nodos,Arbol,Grados).
+
+grado(Nodo,Arbol,Grado) :- grado(0,Nodo,Arbol,Grado).
+grado(G,_,[],G).
+grado(Acc,Nodo,[edge(_,Nodo,_)|Resto],Grado) :- G is Acc +1, grado(G,Nodo,Resto,Grado).
+grado(Acc,Nodo,[edge(_,_,Nodo)|Resto],Grado) :- G is Acc +1, grado(G,Nodo,Resto,Grado).
+grado(Acc,Nodo,[edge(_,A,B)|Resto],Grado) :- Nodo\= A, Nodo \= B, grado(Acc,Nodo,Resto,Grado).
