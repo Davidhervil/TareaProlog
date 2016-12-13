@@ -33,16 +33,13 @@
 % Grafo arana, grafo arana, al mundo salva con su telarana... (8)
 % Grafo arana, grafo arana, al mundo salva con su telarana... (8)
 % Grafo arana, grafo arana, al mundo salva con su telarana... (8)
+edge(g1,a,b).
+edge(g1,b,c).
+edge(g1,a,c). 
 edge(g1,d,a).
 edge(g1,d,b).
 edge(g1,d,c).
-edge(g1,a,b).
-edge(g1,b,c).
-edge(g1,a,c).
 
-edge(g2,a,b).
-edge(g2,b,c).
-edge(g2,a,c).
 
 not(P) :- call(P), !, fail. 
 not(P).
@@ -66,29 +63,24 @@ listNodes(Grafo, X) :-  findall(Nodo, edge(Grafo, Nodo, _), X1),
 buscarHecho(Grafo, H, edge(Grafo,H,X), X) :- edge(Grafo,H,X).  
 buscarHecho(Grafo, H, edge(Grafo,X,H), X) :- edge(Grafo,X,H). 
 
-% Hallar un camino que pase por todos los vertices
-genTree(Grafo, [], _,[]).
-genTree(Grafo, L, E, X) :- 	buscarHecho(Grafo, E, Hecho, E1),
-							member(E1,L), 
-							remv(E1,L,Ls1),
-							genTree(Grafo, Ls1, E1, X1),
-							append([Hecho],X1,X).
+listar_aristas(Grafo,Aristas) :- findall(edge(Grafo,A,B),edge(Grafo,A,B),Aristas).
 
-genTree1(Grafo, L, E, X) :- buscarHecho(Grafo, E, Hecho, E1),
-							member(E1,L),
-							remv(E1,L,Ls),
-							genTree1(Grafo, Ls, E, X1),
-							append([Hecho],X1,X).
-genTree1(Grafo, L, E, X) :- genTree(Grafo, L, E, X).
+listar_en_izquierda(Grafo,Nodo,Aristas) :- findall(edge(Grafo,Nodo,B),edge(Grafo,Nodo,B),Aristas).
+listar_en_derecha(Grafo,Nodo,Aristas) :- findall(edge(Grafo,A,Nodo),edge(Grafo,A,Nodo),Aristas).
 
+arbol_cobertura(Grafo,Arbol) :- listar_aristas(Grafo,Aristas),
+								member(Arista,Aristas),
+								expande([Arista],Arbol,Aristas).
 
-prueba(Grafo,X) :-  listNodes(Grafo, Nodos), 
-					member(Node,Nodos),
-					remv(Node,Nodos,Nodes),
-					genTree1(Grafo, Nodes, Node, X).
+expande(Arbol,ArbolExpandido,Aristas) :- unionfind(Arbol,Ar2,Aristas),
+										 expande(Ar2,ArbolExpandido,Aristas),!.
+expande(Arbol,Arbol,Aristas). %verificar si esto se puede reemplazar sin el lado derecho
 
-check(Grafo,X,Y) :- findall(Arbol,prueba(Grafo,Arbol),Arboles), length(Arboles,X), 
-					quitarRepetidos(Arboles,Rept), length(Rept,Y).
+unionfind(Arbol,[Edge|Arbol],Aristas) :- member(Edge,Aristas), valido(Edge,Arbol).
 
+valido(edge(_,A,B),Arbol) :- pertenece(A,Arbol), \+(pertenece(B,Arbol)). %puede que pueda haber un cut aqui
+valido(edge(_,A,B),Arbol) :- \+(pertenece(A,Arbol)), pertenece(B,Arbol).
 
-
+pertenece(Nodo,[edge(_,Nodo,_)|_]):-!.
+pertenece(Nodo,[edge(_,_,Nodo)|_]):-!.
+pertenece(Nodo,[_|Resto]):-pertenece(Nodo,Resto).
