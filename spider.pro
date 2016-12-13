@@ -72,9 +72,9 @@ arbol_cobertura(Grafo,Arbol) :- listar_aristas(Grafo,Aristas),
 								member(Arista,Aristas),
 								expande([Arista],Arbol,Aristas).
 
+expande(Arbol,Arbol,Aristas):- \+(unionfind(Arbol,_,Aristas)). %verificar si esto se puede reemplazar sin el lado derecho
 expande(Arbol,ArbolExpandido,Aristas) :- unionfind(Arbol,Ar2,Aristas),
-										 expande(Ar2,ArbolExpandido,Aristas),!.
-expande(Arbol,Arbol,Aristas). %verificar si esto se puede reemplazar sin el lado derecho
+										 expande(Ar2,ArbolExpandido,Aristas).
 
 unionfind(Arbol,[Edge|Arbol],Aristas) :- member(Edge,Aristas), valido(Edge,Arbol).
 
