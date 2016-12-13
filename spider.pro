@@ -40,6 +40,35 @@ edge(g1,d,a).
 edge(g1,d,b).
 edge(g1,d,c).
 
+edge(g2,a,b).
+edge(g2,a,c).
+edge(g2,d,a).
+edge(g2,e,a).
+
+edge(g3,f,g).
+edge(g3,g,i).
+edge(g3,f,i).
+edge(g3,h,i).
+edge(g3,h,f).
+edge(g3,a,h).
+edge(g3,a,b).
+edge(g3,b,c).
+edge(g3,c,g).
+edge(g3,d,c).
+edge(g3,b,d).
+edge(g3,d,f).
+edge(g3,a,e).
+edge(g3,a,j).
+edge(g3,j,e).
+edge(g3,a,l).
+edge(g3,k,j).
+edge(g3,l,k).
+edge(g3,l,o).
+edge(g3,m,l).
+edge(g3,n,l).
+
+
+
 % Elimina un elemento de una lista.
 remv(_, [], []).
 remv(X, [X|T], T1) 		:- remv(X, T, T1).
@@ -65,6 +94,7 @@ listar_en_izquierda(Grafo,Nodo,Aristas) :- findall(edge(Grafo,Nodo,B),edge(Grafo
 listar_en_derecha(Grafo,Nodo,Aristas) :- findall(edge(Grafo,A,Nodo),edge(Grafo,A,Nodo),Aristas).
 
 %OJO que se puede optimizar sacando listar_aristas, y utilizando asserts y recordar los retract adecuados.
+%UTILIZAR GRADOS PARA DISTINGURILOS.
 arbol_cobertura(Grafo,Arbol) :- listar_aristas(Grafo,Aristas),
 								member(Arista,Aristas),
 								armar([Arista],Arbol,Aristas).
@@ -91,7 +121,7 @@ check_grados([],ok).
 check_grados([],ya).
 check_grados([Grado|Grados],ok) :- Grado < 3, ! , check_grados(Grados,ok).
 check_grados([Grado|Grados],ya) :- Grado < 3, ! , check_grados(Grados,ya).
-check_grados([Grado|Grados],ok) :- Grado = 3, check_grados(Grados,ya).
+check_grados([Grado|Grados],ok) :- Grado >= 3, check_grados(Grados,ya).
 
 grados([],_,[]).
 grados([Nodo|Nodos],Arbol,[G|Grados]) :- grado(Nodo,Arbol,G),
