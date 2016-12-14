@@ -1,5 +1,8 @@
 :- dynamic(solucion/3).
 
+slice(F0,C0,F1,C1).
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Operaciones sobre rectangulos %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -110,12 +113,13 @@ valid_sublist(N,Squares,Sub) :- 	sublist(Sub,Squares),
 									N*N =:= X2.
 
 winner_sublist(N,Squares) :-   valid_sublist(N,Squares,Sub),
-							   squares_to_area(Sub,X1),
-							   get_score(X1,X2),
+							   bin_packing(N,[],Sub,X1),
+							   squares_to_area(Sub,X2),
+							   get_score(X2,X3),
 							   solucion(N,_,A),
-							   X2 < A,
+							   X3 < A,
 							   retract(solucion(N,B,A)),
-							   asserta(solucion(N,Sub,X2)),
+							   asserta(solucion(N,X1,X3)),
 							   fail.
 
 
@@ -124,6 +128,83 @@ not(P).
 
 get_score(List,X) :- min(List,X1), max(List,X2), X is X2 - X1.
 
-mondrian(N,Min,How) :- asserta(solucion(N,[],N)), gen_sub_squares(N,X1), not(winner_sublist(N,X1)), solucion(N,How,Min).
+mondrian(N,Min,How,X1) :- asserta(solucion(N,[],N)), gen_sub_squares(N,X1), not(winner_sublist(N,X1)), solucion(N,How,Min).
 
-prueba(N,Sub) :- gen_sub_squares(N,X1), valid_sublist(N,X1,Sub).
+prueba(N,Sub) :- gen_sub_squares(N,X1), valid_sublist(N,X1,Sub1), sort(Sub1,Sub2), squares_to_area(Sub2,Sub).
+
+
+
+% Genera las dos posibilidades de un rectangulo
+tetris(A*B,A*B).
+tetris(A*B,B*A).
+
+% Seleccionamos un rectangulo y lo colocamos en el tablero,
+% Elegimos otro rectangulo y lo ponemos al lado,
+% Vemos si no se pasa.
+% Repetir.
+
+% crear_slide([],A*B,X) :- slide(0,0,A,B).
+
+
+bin_packing(_,Puestos, [], Puestos).
+bin_packing(N, [] , 		Rects, X) :- select(A*B,Rects,Nrect),
+										 tetris(A*B,A1*B1),
+										 bin_packing(N, [slice(0,0,A,B)], Nrect, X).  
+bin_packing(N, [P|Puestos], Rects, X) :- select(A*B, Rects, Nrect),
+										 tetris(A*B,A1*B1),
+										 si_cabe(N,P,A1*B1,Pnuevo),
+										 no_solapan_todos(Pnuevo,[P|Puestos]),
+										 bin_packing(N,[Pnuevo,P|Puestos],Nrect, X).
+										 
+
+solapan(slice(X,Y,A,B),slice(X1,Y1,A1,B1)) :- 
+	A > X1, A1 > X, B > Y1, B1 > Y. 
+
+no_solapan_todos(_,[]).
+no_solapan_todos(S,[L|Ls]) :- not(solapan(S,L)),
+							  no_solapan_todos(S,Ls). 
+
+%Derecha
+si_cabe(N, slice(F0,C0,F1,C1), A*B, slice(F1,C0,A1,NY)) :-	NX is N - F1, 
+															A =< NX, 
+															NY is C0+B,
+															NY =< N, 
+															A1 is F1 + A.  %Derecha
+%IZQUIERDA
+si_cabe(N, slice(F0,C0,F1,C1), A*B, slice(A1,C0,F0,NY)) :-  A =< F0,
+															A1 is F0 - A,
+															NY is C0+B,
+															NY =< N.
+
+%Arriba
+si_cabe(N, slice(F0,C0,F1,C1), A*B, slice(F0,NY,A1,C0)) :-  B =< C0,
+															NX is N - F0,
+															A =< NX,
+															NY is C0 - B,
+															A1 is F0 + A.
+
+%Abajo
+si_cabe(N, slice(F0,C0,F1,C1), A*B, slice(F0,C1,NX,NY)) :- NY is C1 + B,
+														   NY =< N,
+														   NX is F0 + A,
+														   NX =< N.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
