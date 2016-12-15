@@ -190,7 +190,7 @@ si_cabe(N, slice(F0,C0,F1,C1), A*B, slice(F0,C1,NX,NY)) :- NY is C1 + B,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Hallar el corte con menor puntaje y la disposicion de los rectangulos.
-mondrian(N,Min,How) :-  retractall(solucion(_,_,_)),
+mincuts(N,Min,How) :-  retractall(solucion(_,_,_)),
 						Area is N*N,
 						asserta(solucion(N,[slice(0,0,N,N)],Area)), 
 						gen_sub_squares(N,X1), 
