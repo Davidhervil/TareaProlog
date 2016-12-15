@@ -188,11 +188,13 @@ si_cabe(N, slice(F0,C0,F1,C1), A*B, slice(F0,C1,NX,NY)) :- NY is C1 + B,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %		  Mondrian Pizza!		%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 % Hallar el corte con menor puntaje y la disposicion de los rectangulos.
-mincuts(N,Min,How) :-  retractall(solucion(_,_,_)),
+mincuts(4,0,[0,0,4,4]) :- !.
+mincuts(N,Min,How) :-   retractall(solucion(_,_,_)),
 						Area is N*N,
 						asserta(solucion(N,[slice(0,0,N,N)],Area)), 
 						gen_sub_squares(N,X1), 
 						not(winner_sublist(N,X1)), 
-						solucion(N,How,Min).
+						solucion(N,How,Min),
+						How \= [A],!.
+mincuts(N,0,[slice(0,0,N,N)]).   
