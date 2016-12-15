@@ -126,15 +126,13 @@ arbol_cobertura(Grafo,Arbol) :- listar_aristas(Grafo,Aristas),
 				length(Nodos,N),
 				member(Arista,Aristas),
 				remv(Arista,Aristas,Resto),
-				armar(N,[Arista],Arbol,Resto),
-				grados(Nodos,Arbol,Grados),
-				\+(span(Grafo,Grados)),
-				asserta(span(Grafo,Grados)).
+				armar(N,[Arista],Arbol,Resto).
 
-arbol_cobertura(N,Aristas,Llevo,Arbol) :-remember(Arista,Aristas,Resto),
+arbol_cobertura(N,Aristas,Llevo,Arbol) :-remember(Arista,Aristas,Reto),
 					valido(Arista,Llevo),
-					arbol_cobertura(N,Resto,[Arista|Llevo],Arbol).
-arbol_cobertura(N,[],A,A):-
+					%arbol_cobertura(N,Aristas,[Arista|Llevo],Arbol).
+					armar(N,[Arista|Llevo],Arbol,Resto).
+arbol_cobertura(N,Ar,A,A):-
 	length(A,Arb),
 	N1 is N -1,
 	Arb = N1.
